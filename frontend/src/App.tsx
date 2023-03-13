@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react'
 import {Coordinates, DrawDot, IncomingMessage} from "./types";
 import {Button, MenuItem, Select, SelectChangeEvent} from "@mui/material";
+import Canvas from "./components/Canvas";
 
 function App() {
 	const [draw, setDraw] = useState<DrawDot[]>([]);
@@ -61,7 +62,7 @@ function App() {
 					{colors.map(el => <MenuItem key={Math.random()} value={el.toLowerCase()}> {el} </MenuItem>)}
 				</Select>
 				<Button type='submit'>Join</Button>
-			</form> : ''}
+			</form> : <Canvas color={color} painted={draw} onDraw={onDraw}/>}
 		</div>
 	)
 }
