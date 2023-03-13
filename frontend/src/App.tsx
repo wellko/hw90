@@ -1,34 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import {useEffect, useRef, useState} from 'react'
+import {Coordinates, DrawDot, IncomingMessage} from "./types";
+import {Button, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [draw, setDraw] = useState<DrawDot[]>([]);
+	const [color, setColor] = useState('');
+	const [isLoggedIn, setLoggedIn] = useState(false);
+	const ws = useRef<WebSocket | null>(null);
+	const colors = ['DarkRed', 'FireBrick', 'Crimson', 'HotPink', 'DeepPink', 'MediumVioletRed', 'Tomato', 'OrangeRed', 'Gold', 'Magenta', 'Lime',
+		'MediumSpringGreen', 'Cyan', 'Blue', 'Peru']
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+	useEffect(() => {
+		ws.current = new WebSocket('ws://localhost:8000/draw');
+		ws.current.onclose = () => console.log("ws closed");
+		ws.current.onmessage = event => {
+			const decodedMessage = JSON.parse(event.data) as IncomingMessage;
+			if (decodedMessage.type === 'NEW_DOT') {
+				setDraw((dots) => [...dots, decodedMessage.payload]);
+			}
+		};
+		return () => {
+			if (ws.current) {
+				ws.current.close();
+			}
+		}
+	}, []);
+
+	const changeColor = (e: SelectChangeEvent) => {
+		setColor(e.target.value);
+	};
+
+	const onDraw = (coords: Coordinates, color: string) => {
+		if (!ws.current) return;
+		ws.current.send(JSON.stringify({
+			type: 'SEND_DOT',
+			payload: {
+				x: coords.x,
+				y: coords.y,
+				color: color,
+			}
+		}));
+	}
+
+	const setUserColor = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!ws.current) return;
+		ws.current.send(JSON.stringify({
+			type: 'SET_COLOR',
+			payload: color
+		}));
+		setLoggedIn(true);
+		console.log(isLoggedIn)
+	};
+
+
+	return (
+		<div className="App">
+			{!isLoggedIn ? <form onSubmit={setUserColor}>
+				<Select value={color} onChange={changeColor} label='Color'>
+					{colors.map(el => <MenuItem key={Math.random()} value={el.toLowerCase()}> {el} </MenuItem>)}
+				</Select>
+				<Button type='submit'>Join</Button>
+			</form> : ''}
+		</div>
+	)
 }
 
 export default App

@@ -1,6 +1,7 @@
 import express from 'express';
 import expressWs from 'express-ws';
 import cors from 'cors';
+const crypto = require('crypto');
 import {ActiveConnections, IncomingMessage} from "./types";
 
 const app = express();
@@ -29,10 +30,7 @@ router.ws('/draw', (ws, req) => {
 					const conn = activeConnections[connId];
 					conn.send(JSON.stringify({
 						type: 'NEW_DOT',
-						payload: {
-							color,
-							coords: decodedMessage.payload
-						}
+						payload: decodedMessage.payload,
 					}));
 				});
 				break;
@@ -41,8 +39,6 @@ router.ws('/draw', (ws, req) => {
 		}
 	});
 });
-
-
 app.use(router);
 app.listen(port, () => {
 	console.log(`Server started on ${port} port!`);
