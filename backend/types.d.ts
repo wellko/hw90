@@ -10,7 +10,7 @@ export interface IncomingMessage {
 }
 
 export interface IncomingDot {
-	coordinateX: number;
-	coordinateY: number;
+	x: number;
+	y: number;
 	color: string;
 }

@@ -109,7 +109,7 @@ const Canvas: React.FC<props> = ({color, painted, onDraw}) => {
 		}
 	};
 
-	return <canvas ref={canvasRef} height={window.innerHeight} width={window.innerWidth}/>;
+	return <canvas ref={canvasRef} width={window.innerWidth} height='600' style={{borderTop: '2px solid black', borderBottom: '2px solid black'}}/>;
 };
 
 

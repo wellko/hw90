@@ -1,8 +1,9 @@
 import express from 'express';
 import expressWs from 'express-ws';
 import cors from 'cors';
+
 const crypto = require('crypto');
-import {ActiveConnections, IncomingMessage} from "./types";
+import {ActiveConnections, IncomingDot, IncomingMessage} from "./types";
 
 const app = express();
 expressWs(app);
@@ -19,18 +20,23 @@ router.ws('/draw', (ws, req) => {
 		delete activeConnections[id];
 	});
 	let color = 'black';
+	let dots:IncomingDot[] = [];
 	ws.on('message', (msg) => {
 		const decodedMessage = JSON.parse(msg.toString()) as IncomingMessage;
+		const result = decodedMessage.payload;
+		console.log(result)
 		switch (decodedMessage.type) {
 			case 'SET_COLOR':
 				color = decodedMessage.payload;
 				break;
 			case 'SEND_DOT':
+				// dots.push(result) ;
+				console.log(dots)
 				Object.keys(activeConnections).forEach(connId => {
 					const conn = activeConnections[connId];
 					conn.send(JSON.stringify({
 						type: 'NEW_DOT',
-						payload: decodedMessage.payload,
+						payload: dots,
 					}));
 				});
 				break;
