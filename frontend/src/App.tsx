@@ -13,13 +13,6 @@ function App() {
 	useEffect(() => {
 		ws.current = new WebSocket('ws://localhost:8000/draw');
 		ws.current.onclose = () => console.log("ws closed");
-		ws.current.onopen = () => {
-			if (ws.current){
-				ws.current.send(JSON.stringify({
-					type: 'GET_DOTS'
-				}))
-			}
-		}
 		ws.current.onmessage = event => {
 			const decodedMessage = JSON.parse(event.data) as IncomingMessage;
 			if (decodedMessage.type === 'NEW_DOT') {
@@ -52,7 +45,6 @@ function App() {
 	const setUserColor = (e: React.FormEvent) => {
 		e.preventDefault();
 	};
-
 
 	return (
 		<>

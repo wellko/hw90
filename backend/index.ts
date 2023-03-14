@@ -17,6 +17,10 @@ router.ws('/draw', (ws, req) => {
 	const id = crypto.randomUUID();
 	console.log('client connected! id=', id);
 	activeConnections[id] = ws;
+	ws.send(JSON.stringify({
+		type: 'NEW_DOT',
+		payload: dots,
+	}));
 	ws.on('close', () => {
 		console.log('client disconnected! id=', id);
 		delete activeConnections[id];
@@ -34,13 +38,6 @@ router.ws('/draw', (ws, req) => {
 						payload: decodedMessage.payload,
 					}));
 				});
-				break;
-			case 'GET_DOTS':
-					const conn = activeConnections[id];
-					conn.send(JSON.stringify({
-						type: 'NEW_DOT',
-						payload: dots,
-					}));
 				break;
 			default:
 				console.log('Unknown message type:', decodedMessage.type);
