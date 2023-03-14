@@ -6,7 +6,7 @@ export interface ActiveConnections {
 
 export interface IncomingMessage {
 	type: string;
-	payload: string;
+	payload: string | IncomingDot[];
 }
 
 export interface IncomingDot {
