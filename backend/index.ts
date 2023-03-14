@@ -25,7 +25,6 @@ router.ws('/draw', (ws, req) => {
 		const decodedMessage = JSON.parse(msg.toString()) as IncomingMessage;
 		switch (decodedMessage.type) {
 			case 'SEND_DOT':
-				console.log(dots)
 				const dot = decodedMessage.payload as IncomingDot[];
 				dots = dots.concat(dot)
 				Object.keys(activeConnections).forEach(connId => {
@@ -37,13 +36,11 @@ router.ws('/draw', (ws, req) => {
 				});
 				break;
 			case 'GET_DOTS':
-				Object.keys(activeConnections).forEach(connId => {
-					const conn = activeConnections[connId];
+					const conn = activeConnections[id];
 					conn.send(JSON.stringify({
 						type: 'NEW_DOT',
 						payload: dots,
 					}));
-				});
 				break;
 			default:
 				console.log('Unknown message type:', decodedMessage.type);
